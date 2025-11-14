@@ -11,3 +11,4 @@ hi teo is helping me atm
 library(tidyverse)
 ```
 
+this is my attempt at learnnning how to use github
