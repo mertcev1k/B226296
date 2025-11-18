@@ -1,14 +1,209 @@
 ---
 title: "Assessment"
+date: "`r Sys.Date()`"
 output: html_document
 ---
 
-dhshdadhadh
-
-hi teo is helping me atm
+Research Question: How do prescribing rates of specific sexually transmitted infection (STI) treatments vary across socioeconomic deprivation levels (SIMD deciles) in Scotland during 2024?
 
 ```{r}
 library(tidyverse)
+library(janitor) # cleaning data
+library(gt) # tables
+library(here) # directory structure
+
+#Importing all the prescription data and removing unnecessary columns
+
+data_january2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/d3eaaf84-0f3b-4fb8-9460-e33503095fbe/download/pitc202401.csv") %>% 
+  clean_names()
+
+data_february2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/86fda652-0e1d-48bb-9368-aa2a560d925b/download/pitc202402.csv") %>% 
+  clean_names()
+
+data_march2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/a42762ac-47cb-4fb6-b9b1-2478a588c0ed/download/pitc202403.csv") %>% 
+  clean_names()
+
+data_april2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/409a02f2-b77c-47a0-917d-4a5a1c90f182/download/pitc202404.csv") %>% 
+  clean_names()
+
+data_may2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/5fbbd126-6166-4249-9620-7ed78e877297/download/pitc202405.csv") %>% 
+  clean_names()
+
+data_june2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/95f7f250-bd04-4e4a-b853-5df75b00a632/download/pitc202406.csv") %>% 
+  clean_names()
+
+data_july2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/1cb425fc-640c-4b37-9013-f8e97f274085/download/pitc202407.csv") %>% 
+  clean_names()
+
+data_august2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/e4985a62-9d59-4e71-8800-3f7ca29ffe0c/download/pitc202408.csv") %>% 
+  clean_names()
+
+data_september2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/d1fbede3-98c4-436e-9e75-2ed807a36075/download/pitc202409.csv") %>% 
+  clean_names()
+
+data_october2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/0d27f6e8-5f8b-42c4-9fe9-c44389af2d3e/download/pitc202410.csv") %>% 
+  clean_names()
+
+data_november2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/1b97dffc-310e-4a30-bf9c-22fddff3f499/download/pitc202411.csv") %>% 
+  clean_names()
+
+data_december2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/e4380152-3d16-446b-9072-108e93cf5caa/download/pitc202412.csv") %>% 
+  clean_names()
+
+data_january2024   <- data_january2024   %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_february2024  <- data_february2024  %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_march2024     <- data_march2024     %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_april2024     <- data_april2024     %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_may2024       <- data_may2024       %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_june2024      <- data_june2024      %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_july2024      <- data_july2024      %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_august2024    <- data_august2024    %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_september2024 <- data_september2024 %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_october2024   <- data_october2024   %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_november2024  <- data_november2024  %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
+data_december2024  <- data_december2024  %>% select(-c(dmd_code, bnf_item_code, prescribed_type))
 ```
 
-this is my attempt at learnnning how to use github
+```{r}
+#Joining all of the months for 2024
+prescriptions_2024 <- bind_rows(data_january2024, data_february2024, data_march2024,data_april2024,data_may2024, data_june2024, data_july2024, data_august2024, data_september2024, data_october2024, data_november2024, data_december2024)
+
+#Checking if they have binded correctly
+prescriptions_2024 %>% count(paid_date_month)
+```
+
+```{r}
+#Removing data to save memory
+rm(data_january2024, data_february2024, data_march2024,data_april2024,data_may2024, data_june2024, data_july2024, data_august2024, data_september2024, data_october2024, data_november2024, data_december2024)
+```
+
+```{r}
+#Importing GP data for location
+GP_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/f23655c3-6e23-4103-a511-a80d998adb90/resource/215e9157-ccf2-47ab-aba5-4fb79eb32e41/download/practice_contactdetails_jul2024-open-data.csv") %>% 
+  clean_names()
+
+names(GP_2024)
+```
+
+```{r}
+#Selecting relevant columns and ensuring there is no row duplication in unique gp identifier (practice code)
+GP_2024 <- GP_2024 %>%
+  select(practice_code, practice_list_size, data_zone, gp_cluster) %>%
+  distinct(practice_code, .keep_all = TRUE)
+```
+
+```{r}
+#Importing SIMD data for deprivation score
+SIMD <- read_csv("https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv") %>% 
+  clean_names()
+
+names(SIMD)
+```
+
+```{r}
+#Selecting relevant columns and ensuring there is no row duplication in unique region identifier (data zone)
+SIMD <- SIMD %>%
+  select(data_zone, simd_rank   = simd2020v2rank, simd_decile = simd2020v2country_decile) %>%
+  distinct(data_zone, .keep_all = TRUE)
+```
+
+```{r}
+# Ensure GP identifiers match in type before joining (required because one was numeric and the other character)
+prescriptions_2024 <- prescriptions_2024 %>%
+  mutate(gp_practice = as.character(gp_practice))
+
+GP_2024 <- GP_2024 %>%
+  mutate(practice_code = as.character(practice_code))
+
+# Join prescriptions with GP data (adds list size + data zone to each prescription)
+presc_gp <- prescriptions_2024 %>%
+  left_join(GP_2024, by = c("gp_practice" = "practice_code"))
+
+# Join with SIMD data using data_zone (both already character, so no conversion needed)
+final_dataset <- presc_gp %>%
+  left_join(SIMD, by = "data_zone")
+```
+
+```{r}
+#Removing data to save memory
+rm(GP_2024, presc_gp, prescriptions_2024, SIMD)
+```
+
+```{r}
+#Identifying GP practices that did not successfully match to GP location data
+gp_missing <- final_dataset %>%
+  distinct(gp_practice, data_zone) %>%
+  filter(is.na(data_zone))
+
+gp_missing
+```
+
+```{r}
+#Keeping only rows with valid GP location and SIMD deprivation information
+analysis_data <- final_dataset %>%
+  drop_na(data_zone, simd_decile)
+```
+
+```{r}
+#Checking which specific columns still contain missing values
+colSums(is.na(analysis_data))
+```
+
+```{r}
+library(stringr)
+
+#List of STI-related drugs to search for according to Tuddenham, S., Hamill, M.M. and Ghanem, K.G (2022)
+sti_drugs <- c("CEFTRIAXONE", "CEFIXIME", "GENTAMICIN", "AZITHROMYCIN", "DOXYCYCLINE", "LEVOFLOXACIN", "AMOXICILLIN", "ERYTHROMYCIN", "BENZATHINE BENZYLPENICILLIN", "PROCAINE BENZYLPENICILLIN", "MOXIFLOXACIN", "METRONIDAZOLE", "TINIDAZOLE")
+
+#Create a single search pattern to identify any STI drug in the dataset
+sti_pattern <- paste(sti_drugs, collapse = "|")
+
+#Keep only prescriptions that relate to STI treatments
+sti_data <- analysis_data %>%
+  filter(!is.na(bnf_item_description), str_detect(bnf_item_description, sti_pattern))
+```
+
+```{r}
+#Removing data to save memory
+rm(analysis_data, final_dataset, gp_missing)
+```
+
+
+```{r}
+#Add a clean drug name label for each prescription
+sti_data <- sti_data %>%
+  mutate(drug_name = case_when(str_detect(bnf_item_description, "CEFTRIAXONE") ~ "Ceftriaxone", str_detect(bnf_item_description, "CEFIXIME") ~ "Cefixime", str_detect(bnf_item_description, "GENTAMICIN") ~ "Gentamicin", str_detect(bnf_item_description, "AZITHROMYCIN") ~ "Azithromycin", str_detect(bnf_item_description, "DOXYCYCLINE") ~ "Doxycycline", str_detect(bnf_item_description, "LEVOFLOXACIN") ~ "Levofloxacin", str_detect(bnf_item_description, "AMOXICILLIN") ~ "Amoxicillin", str_detect(bnf_item_description, "ERYTHROMYCIN") ~ "Erythromycin", str_detect(bnf_item_description, "BENZATHINE BENZYLPENICILLIN") ~ "Benzathine benzylpenicillin", str_detect(bnf_item_description, "PROCAINE BENZYLPENICILLIN") ~ "Procaine benzylpenicillin", str_detect(bnf_item_description, "BENZYLPENICILLIN") ~ "Benzylpenicillin", str_detect(bnf_item_description, "MOXIFLOXACIN") ~ "Moxifloxacin", str_detect(bnf_item_description, "METRONIDAZOLE") ~ "Metronidazole", str_detect(bnf_item_description, "TINIDAZOLE") ~ "Tinidazole", str_detect(bnf_item_description, "ACICLOVIR") ~ "Aciclovir", str_detect(bnf_item_description, "VALACICLOVIR") ~ "Valaciclovir", str_detect(bnf_item_description, "FAMCICLOVIR") ~ "Famciclovir", TRUE ~ NA_character_))
+```
+
+
+```{r}
+#Checking which specific columns still contain missing values
+colSums(is.na(sti_data))
+```
+
+
+```{r}
+#Calculate STI prescribing at the data-zone level
+sti_by_zone <- sti_data %>%
+  group_by(data_zone, simd_decile, drug_name) %>%
+  summarise(sti_items = sum(number_of_paid_items), list_size = mean(practice_list_size)) %>%
+  mutate(sti_items_per_1000 = (sti_items / list_size) * 1000)
+```
+
+
+```{r}
+#Create a dataset summarising STI prescribing for each drug within each SIMD decile
+sti_plot <- sti_by_zone %>%
+  group_by(simd_decile, drug_name) %>%
+  summarise(mean_sti_rate = mean(sti_items_per_1000)) %>%
+  ggplot(aes(x = factor(simd_decile), y = mean_sti_rate, fill = factor(simd_decile))) +
+  geom_col() +
+  facet_wrap(~ drug_name, scales = "free_y") +
+  scale_fill_viridis_d(option = "inferno") +
+  labs(title = "STI Prescribing Rates by SIMD Decile and Drug (2024)", x = "SIMD Decile (1 = Most Deprived, 10 = Least Deprived)", y = "STI prescriptions per 1,000 patients", fill = "SIMD Decile") +
+  theme_bw()
+
+sti_plot
+```
+
+sti_plot
