@@ -181,6 +181,33 @@ sti_data <- sti_data %>%
 colSums(is.na(sti_data))
 ```
 
+```{r}
+#Calculating overall STI prescribing (across all drugs) for each SIMD decile
+sti_overall <- sti_data %>%
+  group_by(data_zone, simd_decile) %>%
+  summarise(sti_items = sum(number_of_paid_items, na.rm = TRUE), list_size = mean(practice_list_size, na.rm = TRUE)) %>%
+  mutate(sti_items_per_1000 = 1000 * sti_items / list_size) %>%
+  group_by(simd_decile) %>%
+  summarise(mean_rate = mean(sti_items_per_1000, na.rm = TRUE))
+```
+
+```{r}
+#Simple bar chart
+sti_simple_plot <- sti_overall %>%
+  ggplot(aes(x = factor(simd_decile), y = mean_rate, fill = factor(simd_decile))) +
+  geom_col() +
+  scale_fill_viridis_d(option = "inferno") +
+  labs(title = "Overall STI Prescribing Rates by SIMD Decile (2024)", x = "SIMD Decile (1 = Most Deprived, 10 = Least Deprived)", y = "STI prescriptions per 1,000 patients", fill = "SIMD Decile") +
+  theme_bw()
+
+sti_simple_plot
+```
+
+This plot shows that overall STI prescribing is highest in the most deprived SIMD deciles and steadily declines toward the least deprived areas. This suggests that deprivation is linked to greater need or higher rates of STI treatment.
+
+To understand why this pattern appears, the next step is to break the data down by individual drugs. Different STI treatments vary in cost, usage, and clinical purpose, so looking at them separately will show whether all drugs follow the same deprivation trend or whether certain treatments drive the pattern more than others.
+
+By examining each drug’s prescribing rate across SIMD deciles, it becomes possible to see whether access, clinical demand, or socioeconomic factors differ between treatments. This will help explain the overall gradient and reveal which drugs contribute most to the disparity.
 
 ```{r}
 #Calculate STI prescribing at the data-zone level
@@ -206,4 +233,4 @@ sti_plot <- sti_by_zone %>%
 sti_plot
 ```
 
-sti_plot
+A potential next step is to examine whether the cost of different STI treatments contributes to the prescribing differences across SIMD deciles, helping to determine if price plays a role in the observed deprivation gradient
